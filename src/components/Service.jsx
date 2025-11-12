@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios, { API_BASE_URL } from '../utils/axiosConfig';
 import { 
   Scissors, 
   Sparkles, 

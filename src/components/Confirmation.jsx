@@ -4,7 +4,7 @@ import { Check, Package, ArrowRight, Truck, Star, Gift, ShoppingBag, MapPin, Mai
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
-import axios from 'axios';
+import axios, { API_BASE_URL } from '../utils/axiosConfig';
 
 const API_BASE_URL = import.meta?.env?.VITE_API_BASE_URL || 'https://sole-craft-backend.vercel.app';
 axios.defaults.baseURL = API_BASE_URL;

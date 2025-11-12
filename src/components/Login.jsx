@@ -19,8 +19,8 @@ import {
   Award
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import axios, { API_BASE_URL } from '../utils/axiosConfig';
 
 // Configure axios base URL (use Vite env var when available)
 const API_BASE_URL = import.meta?.env?.VITE_API_BASE_URL || 'https://sole-craft-backend.vercel.app';
@@ -38,6 +38,7 @@ export default function EnhancedLoginPage() {
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [searchParams] = useSearchParams();
   
   const navigate = useNavigate();
 
@@ -65,6 +66,13 @@ export default function EnhancedLoginPage() {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
+
+  useEffect(() => {
+    const error = searchParams.get('error');
+    if (error === 'session_expired') {
+      setError('Your session has expired. Please login again.');
+    }
+  }, [searchParams]);
 
   const verifyToken = async (token) => {
     try {

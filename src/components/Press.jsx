@@ -28,7 +28,7 @@ import {
   Zap,
   Eye
 } from 'lucide-react';
-import axios from 'axios';
+import axios, { API_BASE_URL } from '../utils/axiosConfig';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import Vogue from '../assets/Vogue.webp';
