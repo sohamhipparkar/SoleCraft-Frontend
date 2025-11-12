@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import axios, { API_BASE_URL } from '../utils/axiosConfig';
 
 export default function Register() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);

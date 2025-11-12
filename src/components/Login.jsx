@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import axios, { API_BASE_URL } from '../utils/axiosConfig';
 
 // Configure axios base URL (use Vite env var when available)
 const API_BASE_URL = import.meta?.env?.VITE_API_BASE_URL || 'https://sole-craft-backend.vercel.app';

@@ -2,10 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { Menu, X, RefreshCw, Palette, Wrench, DollarSign, ShoppingBag, MapPin, LogOut, User, ChevronDown, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import axios, { API_BASE_URL } from '../utils/axiosConfig';
 
 // Configure axios base URL
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'https://sole-craft-backend.vercel.app';
 
 export default function CobblersNavbar() {
   const [isOpen, setIsOpen] = useState(false);

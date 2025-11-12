@@ -23,7 +23,7 @@ import {
   Layers
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios, { API_BASE_URL } from '../utils/axiosConfig';
 import Navbar from './Navbar';
 import Footer from './Footer';
 

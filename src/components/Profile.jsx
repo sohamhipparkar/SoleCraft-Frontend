@@ -33,7 +33,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios, { API_BASE_URL } from '../utils/axiosConfig';
 import Navbar from './Navbar';
 import Footer from './Footer';
 

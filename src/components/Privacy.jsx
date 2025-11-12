@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import Navbar from './Navbar';
 import Footer from './Footer';
-import axios from 'axios';
+import axios, { API_BASE_URL } from '../utils/axiosConfig';
 
 const containerVariants = {
   hidden: { opacity: 0 },
