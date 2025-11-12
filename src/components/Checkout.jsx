@@ -6,8 +6,6 @@ import axios, { API_BASE_URL } from '../utils/axiosConfig';
 import Navbar from './Navbar';
 import Footer from './Footer';
 
-// Configure axios base URL (use Vite env var when available)
-const API_BASE_URL = import.meta?.env?.VITE_API_BASE_URL || 'https://sole-craft-backend.vercel.app';
 axios.defaults.baseURL = API_BASE_URL;
 
 // Add token to requests if available

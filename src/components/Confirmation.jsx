@@ -6,8 +6,6 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import axios, { API_BASE_URL } from '../utils/axiosConfig';
 
-const API_BASE_URL = import.meta?.env?.VITE_API_BASE_URL || 'https://sole-craft-backend.vercel.app';
-axios.defaults.baseURL = API_BASE_URL;
 
 // Confetti component
 const Confetti = () => {

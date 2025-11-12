@@ -22,10 +22,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import axios, { API_BASE_URL } from '../utils/axiosConfig';
 
-// Configure axios base URL (use Vite env var when available)
-const API_BASE_URL = import.meta?.env?.VITE_API_BASE_URL || 'https://sole-craft-backend.vercel.app';
-axios.defaults.baseURL = API_BASE_URL;
-
 export default function EnhancedLoginPage() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [email, setEmail] = useState('');

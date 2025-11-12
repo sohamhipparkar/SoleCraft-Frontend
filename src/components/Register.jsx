@@ -36,9 +36,6 @@ export default function Register() {
   
   const navigate = useNavigate();
 
-  // Configure axios base URL
-  const API_BASE_URL = import.meta?.env?.VITE_API_BASE_URL || 'https://sole-craft-backend.vercel.app';
-  axios.defaults.baseURL = API_BASE_URL;
 
   useEffect(() => {
     const timer = setTimeout(() => {

@@ -4,8 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios, { API_BASE_URL } from '../utils/axiosConfig';
 
-// Configure axios base URL
-const API_BASE_URL = 'https://sole-craft-backend.vercel.app';
 
 export default function CobblersNavbar() {
   const [isOpen, setIsOpen] = useState(false);

@@ -33,9 +33,6 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import Vogue from '../assets/Vogue.webp';
 
-// Configure axios base URL (use Vite env var when available)
-const API_BASE_URL = import.meta?.env?.VITE_API_BASE_URL || 'https://sole-craft-backend.vercel.app';
-axios.defaults.baseURL = API_BASE_URL;
 
 const containerVariants = {
   hidden: { opacity: 0 },

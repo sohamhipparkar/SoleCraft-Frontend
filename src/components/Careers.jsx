@@ -34,10 +34,6 @@ import axios, { API_BASE_URL } from '../utils/axiosConfig';
 import Navbar from './Navbar';
 import Footer from './Footer';
 
-// Configure axios
-const API_BASE_URL = 'https://sole-craft-backend.vercel.app';
-axios.defaults.baseURL = API_BASE_URL;
-
 // Add token to requests if available
 axios.interceptors.request.use(
   (config) => {
