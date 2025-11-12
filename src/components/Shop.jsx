@@ -94,16 +94,36 @@ export default function ShoeShopComponent() {
       if (filterOptions.priceRange[0] > 0) params.minPrice = filterOptions.priceRange[0];
       if (filterOptions.priceRange[1] < 200) params.maxPrice = filterOptions.priceRange[1];
 
-      const response = await axios.get('/api/products', { params });
+      const response = await axios.get('/api/products', { 
+        params
+      });
 
       if (response.data.success) {
-        setProducts(response.data.products);
-        setPagination(response.data.pagination);
+        setProducts(response.data.products || []);
+        setPagination(response.data.pagination || {
+          currentPage: 1,
+          totalPages: 1,
+          totalItems: 0,
+          itemsPerPage: 12
+        });
       }
     } catch (error) {
       console.error('Error fetching products:', error);
-      setError(error.response?.data?.message || 'Failed to load products');
-      showNotification('Failed to load products', 'error');
+      
+      let errorMessage = 'Failed to load products';
+      
+      if (error.code === 'ECONNABORTED') {
+        errorMessage = 'Request timed out. Please try again.';
+      } else if (error.code === 'ERR_NETWORK') {
+        errorMessage = 'Network error. Please check your connection.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      
+      setError(errorMessage);
+      showNotification(errorMessage, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -114,10 +134,22 @@ export default function ShoeShopComponent() {
     try {
       const response = await axios.get('/api/shop/stats');
       if (response.data.success) {
-        setStats(response.data.stats);
+        setStats(response.data.stats || {
+          totalProducts: 0,
+          inStockProducts: 0,
+          totalOrders: 0,
+          averageRating: 0
+        });
       }
     } catch (error) {
       console.error('Error fetching stats:', error);
+      // Don't show notification for stats - keep default values
+      setStats({
+        totalProducts: products.length || 0,
+        inStockProducts: products.filter(p => p.inStock).length || 0,
+        totalOrders: 0,
+        averageRating: 0
+      });
     }
   };
 
@@ -126,10 +158,12 @@ export default function ShoeShopComponent() {
     try {
       const response = await axios.get('/api/products/filters/brands');
       if (response.data.success) {
-        setBrands(['all', ...response.data.brands]);
+        setBrands(['all', ...(response.data.brands || [])]);
       }
     } catch (error) {
       console.error('Error fetching brands:', error);
+      // Keep default 'all' option if fetch fails
+      setBrands(['all']);
     }
   };
 
@@ -138,10 +172,12 @@ export default function ShoeShopComponent() {
     try {
       const response = await axios.get('/api/products/filters/categories');
       if (response.data.success) {
-        setCategories(response.data.categories);
+        setCategories(response.data.categories || []);
       }
     } catch (error) {
       console.error('Error fetching categories:', error);
+      // Keep empty array if fetch fails
+      setCategories([]);
     }
   };
 
@@ -152,10 +188,23 @@ export default function ShoeShopComponent() {
     try {
       const response = await axios.get('/api/cart');
       if (response.data.success) {
-        setCart(response.data.cart);
+        setCart(response.data.cart || { items: [], subtotal: 0, itemCount: 0 });
       }
     } catch (error) {
       console.error('Error fetching cart:', error);
+      
+      // Handle specific errors
+      if (error.response?.status === 401) {
+        // Token expired or invalid
+        localStorage.removeItem('token');
+        setCart({ items: [], subtotal: 0, itemCount: 0 });
+      } else if (error.response?.status === 404) {
+        // Cart not found - initialize empty cart
+        setCart({ items: [], subtotal: 0, itemCount: 0 });
+      } else if (error.code !== 'ERR_NETWORK') {
+        // Only show error if it's not a network error
+        // Network errors are already handled globally
+      }
     }
   };
 
@@ -166,10 +215,16 @@ export default function ShoeShopComponent() {
     try {
       const response = await axios.get('/api/product-wishlist');
       if (response.data.success) {
-        setWishlist(response.data.wishlist.map(item => item._id));
+        setWishlist(response.data.wishlist?.map(item => item._id) || []);
       }
     } catch (error) {
       console.error('Error fetching wishlist:', error);
+      // Don't show error for 404 - wishlist endpoint might not be implemented yet
+      if (error.response?.status !== 404) {
+        // Only log other errors, don't show notification to user
+      }
+      // Set empty wishlist on error
+      setWishlist([]);
     }
   };
 
@@ -177,7 +232,7 @@ export default function ShoeShopComponent() {
   const addToCart = async (product) => {
     if (!isAuthenticated) {
       showNotification('Please login to add items to cart', 'error');
-      navigate('/login');
+      setTimeout(() => navigate('/login'), 1500);
       return;
     }
 
@@ -186,9 +241,9 @@ export default function ShoeShopComponent() {
       const response = await axios.post('/api/cart/add', {
         productId: product._id,
         quantity: 1,
-        size: '',
-        color: ''
-      });
+        size: product.sizes?.[0] || '',
+        color: product.colors?.[0] || ''
+      }, { timeout: 5000 });
 
       if (response.data.success) {
         await fetchCart();
@@ -196,10 +251,26 @@ export default function ShoeShopComponent() {
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
-      showNotification(
-        error.response?.data?.message || 'Failed to add to cart',
-        'error'
-      );
+      
+      let errorMessage = 'Failed to add to cart';
+      
+      if (error.response?.status === 401) {
+        errorMessage = 'Please login again to add items to cart';
+        setTimeout(() => {
+          localStorage.removeItem('token');
+          navigate('/login');
+        }, 1500);
+      } else if (error.response?.status === 400) {
+        errorMessage = error.response.data?.message || 'Invalid product details';
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Product not found';
+      } else if (error.code === 'ERR_NETWORK') {
+        errorMessage = 'Network error. Please check your connection.';
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      
+      showNotification(errorMessage, 'error');
     } finally {
       setIsCartLoading(false);
     }
@@ -244,7 +315,7 @@ export default function ShoeShopComponent() {
   const toggleWishlist = async (productId) => {
     if (!isAuthenticated) {
       showNotification('Please login to add to wishlist', 'error');
-      navigate('/login');
+      setTimeout(() => navigate('/login'), 1500);
       return;
     }
 
@@ -252,20 +323,36 @@ export default function ShoeShopComponent() {
       const isInWishlist = wishlist.includes(productId);
 
       if (isInWishlist) {
-        await axios.delete(`/api/product-wishlist/${productId}`);
-        setWishlist(wishlist.filter(id => id !== productId));
-        showNotification('Removed from wishlist', 'success');
+        const response = await axios.delete(`/api/product-wishlist/${productId}`);
+        if (response.data.success) {
+          setWishlist(wishlist.filter(id => id !== productId));
+          showNotification('Removed from wishlist', 'success');
+        }
       } else {
-        await axios.post(`/api/product-wishlist/${productId}`);
-        setWishlist([...wishlist, productId]);
-        showNotification('Added to wishlist', 'success');
+        const response = await axios.post(`/api/product-wishlist/${productId}`);
+        if (response.data.success) {
+          setWishlist([...wishlist, productId]);
+          showNotification('Added to wishlist', 'success');
+        }
       }
     } catch (error) {
       console.error('Error toggling wishlist:', error);
-      showNotification(
-        error.response?.data?.message || 'Failed to update wishlist',
-        'error'
-      );
+      
+      // Handle specific error cases
+      if (error.response?.status === 404) {
+        showNotification('Wishlist feature is currently unavailable', 'error');
+      } else if (error.response?.status === 401) {
+        showNotification('Please login again to use wishlist', 'error');
+        setTimeout(() => {
+          localStorage.removeItem('token');
+          navigate('/login');
+        }, 1500);
+      } else {
+        showNotification(
+          error.response?.data?.message || 'Failed to update wishlist',
+          'error'
+        );
+      }
     }
   };
 
@@ -320,31 +407,41 @@ export default function ShoeShopComponent() {
   // Initial data fetch
   useEffect(() => {
     const initializeData = async () => {
+      // Fetch products first (most important)
       await fetchProducts();
-      await fetchStats();
-      await fetchBrands();
-      await fetchCategories();
       
+      // Then fetch supplementary data in parallel (non-critical)
+      await Promise.allSettled([
+        fetchStats(),
+        fetchBrands(),
+        fetchCategories()
+      ]);
+      
+      // Finally fetch user-specific data if authenticated
       if (isAuthenticated) {
-        await fetchCart();
-        await fetchWishlist();
+        await Promise.allSettled([
+          fetchCart(),
+          fetchWishlist()
+        ]);
       }
     };
 
     initializeData();
-  }, []); // Empty dependency array - runs only on mount
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Add a new useEffect to fetch cart when auth status changes
   useEffect(() => {
     if (isAuthenticated) {
-      fetchCart();
-      fetchWishlist();
+      Promise.allSettled([
+        fetchCart(),
+        fetchWishlist()
+      ]);
     } else {
       // Clear cart and wishlist if not authenticated
       setCart({ items: [], subtotal: 0, itemCount: 0 });
       setWishlist([]);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch products when filters change
   useEffect(() => {
