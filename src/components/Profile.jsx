@@ -22,6 +22,7 @@ import {
   Award,
   CreditCard,
   ChevronRight,
+  CheckCircle,
   Eye,
   Lock,
   Bell,
