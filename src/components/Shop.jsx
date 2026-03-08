@@ -4,25 +4,20 @@ import { ShoppingBag, Heart, Star, Filter, ChevronDown, Search, ShoppingCart, Ta
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 
-// Configure axios
-const API_BASE_URL = 'http://localhost:5000';
-axios.defaults.baseURL = API_BASE_URL;
-
-// Add token to requests if available
-axios.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+// Get API base URL for image references
+const getApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
   }
-);
+  if (import.meta.env.PROD) {
+    return "https://sole-craft-backend.vercel.app";
+  }
+  return "http://localhost:5000";
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 const containerVariants = {
   hidden: { opacity: 0 },
