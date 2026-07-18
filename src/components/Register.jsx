@@ -39,7 +39,7 @@ export default function Register() {
   
   const navigate = useNavigate();
 
-  // Password strength calculation
+  // Password strength calculator
   const calculatePasswordStrength = (pass) => {
     let score = 0;
     const checks = {
@@ -57,7 +57,7 @@ export default function Register() {
     if (checks.number) score += 20;
     if (checks.special) score += 20;
 
-    // Determine strength level
+    // Determine strength of password
     let text = '';
     let color = '';
     if (score === 0) {
