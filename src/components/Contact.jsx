@@ -88,6 +88,7 @@ export default function ContactUsComponent() {
     { id: 'wholesale', icon: Users, name: 'Wholesale', color: 'amber' }
   ];
 
+  //FAQ Data 
   const faqData = {
     general: [
       {

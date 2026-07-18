@@ -53,6 +53,7 @@ export default function ShippingReturnsComponent() {
   const [openQuestionId, setOpenQuestionId] = useState(null);
   const [trackingNumber, setTrackingNumber] = useState('');
 
+  //Shipping, Delivery, Returns, Refunds, International FAQ Data
   const shippingReturnsData = {
     shipping: [
       {
